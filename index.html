@@ -106,7 +106,6 @@
             text-shadow: 0 0 20px rgba(255, 71, 87, 0.6), 0 0 10px #1e90ff !important;
         }
 
-        /* 잭팟 스타일 추가 */
         .jackpot-title {
             color: #ffd700 !important;
             text-shadow: 0 0 25px rgba(255, 215, 0, 0.9), 0 0 10px #ff8c00 !important;
@@ -284,16 +283,6 @@ function playNormalEndSound() {
     playTickSound(587.33, 'triangle', 0.15);
 }
 
-function speakEnglish(text) {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.95;
-        window.speechSynthesis.speak(utterance);
-    }
-}
-
 // 무기 데이터
 const weaponsData = {
     main: ["돌격소총", "활", "점사소총", "석궁", "건블레이드", "RPG", "산탄총", "저격소총", "에너지 소총", "화염방사기", "유탄발사기", "미니건", "페인트볼 총", "왜곡", "만년서리"],
@@ -302,47 +291,10 @@ const weaponsData = {
     utility: ["수류탄", "섬광탄", "얼음 광선총", "점프 패드", "화염병", "C4", "연막탄", "전쟁의 뿔", "구급상자", "지뢰", "워프스톤", "그래플러"]
 };
 
-// 국가 및 스페셜 항목 매칭 영어 명칭
-const countryEnglishMap = {
-    "🗡️ 총검조합": "Bayonet Loadout",
-    "🇺🇸 미국": "United States", "🇯🇵 일본": "Japan", "🇨🇳 중국": "China", "🇷🇺 러시아": "Russia", "🇬🇧 영국": "United Kingdom",
-    "🇩🇪 독일": "Germany", "🇫🇷 프랑스": "France", "🇨🇦 캐나다", "🇦🇺 호주", "🇧🇷 브라질", "🇮🇹 이탈리아", "🇪🇸 스페인", "🇮🇳 인도", "🇻🇳 베트남", "🇹🇭 태국",
-    "🇹🇷 튀르키예": "Turkey", "🇲🇽 멕시코": "Mexico", "🇪🇬 이집트": "Egypt", "🇸🇦 사우디아라비아": "Saudi Arabia", "🇿🇦 남아프리카 공화국": "South Africa",
-    "🇦🇷 아르헨티나": "Argentina", "🇳🇱 네덜란드": "Netherlands", "🇸🇪 스웨덴": "Sweden", "🇨🇭 스위스": "Switzerland", "🇳🇿 뉴질랜드": "New Zealand",
-    "🇵🇭 필리핀": "Philippines", "🇲🇾 말레이시아": "Malaysia", "🇸🇬 싱가포르": "Singapore", "🇮🇩 인도네시아": "Indonesia", "🇺🇦 우크라이나": "Ukraine",
-    "🇵🇱 폴란드": "Poland", "🇳🇴 노르웨이": "Norway", "🇩🇰 덴마크": "Denmark", "🇫🇮 핀란드": "Finland", "🇮🇪 아일랜드": "Ireland",
-    "🇧🇪 벨기에": "Belgium", "🇦🇹 오스트리아": "Austria", "🇬🇷 그리스": "Greece", "🇵🇹 포르투갈": "Portugal", "🇨🇿 체코": "Czech Republic",
-    "🇭🇺 헝가리": "Hungary", "🇷🇴 루마니아": "Romania", "🇧🇬 불가리아": "Bulgaria", "🇭🇷 크로아티아": "Croatia", "🇷🇸 세르비아": "Serbia",
-    "🇸幻 슬로바키아": "Slovakia", "🇸🇮 슬로베니아": "Slovenia", "🇺🇿 우즈베키스탄": "Uzbekistan", "🇰🇿 카자흐스탄": "Kazakhstan", "🇲🇳 몽골": "Mongolia",
-    "🇵🇰 파키스탄": "Pakistan", "🇧🇩 방글라데시": "Bangladesh", "🇱🇰 스리랑카": "Sri Lanka", "🇮🇷 이란": "Iran", "🇮🇶 이라크": "Iraq",
-    "🇮🇱 이스라엘": "Israel", "🇦🇪 아랍에미리트": "United Arab Emirates", "🇶🇦 카타르": "Qatar", "🇰🇼 쿠웨이트": "Kuwait", "🇴🇲 오만": "Oman",
-    "🇯🇴 요르단": "Jordan", "🇱🇧 레바논": "Lebanon", "🇨🇱 칠레": "Chile", "🇨🇴 콜롬비아": "Colombia", "🇵🇪 페루": "Peru",
-    "🇻🇪 베네수엘라": "Venezuela", "🇪🇨 에콰도르": "Ecuador", "🇧🇴 볼리비아": "Bolivia", "🇵🇾 파라과이": "Paraguay", "🇺🇾 우루과이": "Uruguay",
-    "🇨🇺 쿠바": "Cuba", "🇨🇷 코스타리카": "Costa Rica", "🇵🇦 파나마": "Panama", "🇩🇴 도미니카 공화국": "Dominican Republic", "🇬🇹 과테말라": "Guatemala",
-    "🇭🇳 온두라스": "Honduras", "🇸🇻 엘살바도르": "El Salvador", "🇳🇮 니카라과": "Nicaragua", "🇲🇦 모로코": "Morocco", "🇩🇿 알제리": "Algeria",
-    "🇹🇳 튀니지": "Tunisia", "🇱🇾 리비아": "Libya", "🇳🇬 나이지리아": "Nigeria", "🇬🇭 가나": "Ghana", "🇰🇪 케냐": "Kenya",
-    "🇪🇹 에티오피아": "Ethiopia", "🇹🇿 탄자니아": "Tanzania", "🇺🇬 우간다": "Uganda", "🇲🇩 몰도바": "Moldova", "🇬🇪 조지아": "Georgia",
-    "🇦🇲 아르메니아": "Armenia", "🇦🇿 아제르바이잔": "Azerbaijan", "🇮🇸 아이슬란드": "Iceland", "🇱🇺 룩셈부르크": "Luxembourg", "🇲🇨 모나코": "Monaco",
-    "🇻🇦 바티칸 시국": "Vatican City", "🇲🇹 몰타": "Malta", "🇨🇾 키프로스": "Cyprus", "🇲🇲 미얀마": "Myanmar", "🇰🇭 캄보디아": "Cambodia",
-    "🇱🇦 라오스": "Laos", "🇳🇵 네팔": "Nepal", "🇧🇹 부탄": "Bhutan", "🇲🇻 몰디브": "Maldives", "🇼🇸 사모아": "Samoa",
-    "🇫🇯 피지": "Fiji", "🇹🇬 토고": "Togo", "🇧🇭 바레인": "Bahrain", "🇾🇪 예멘": "Yemen", "🇦🇩 안도라": "Andorra",
-    "🇸🇲 산마리노": "San Marino", "🇱🇮 리히텐슈타인": "Liechtenstein", "🇲🇬 마다가스카르": "Madagascar", "🇦🇴 앙골라": "Angola", "🇿🇲 잠비아": "Zambia",
-    "🇿🇼 짐바브웨": "Zimbabwe", "🇧🇼 보츠와나": "Botswana", "🇳🇦 나미비아": "Namibia", "🇲🇿 모زام비크": "Mozambique", "🇨엠 카메룬": "Cameroon",
-    "🇨🇬 콩고": "Congo", "🇨🇩 콩고민주공화국": "Democratic Republic of the Congo", "🇬🇦 가봉": "Gabon", "🇨🇫 중앙아프리카 공화국": "Central African Republic", "🇹🇩 차드": "Chad",
-    "🇳🇪 니제르": "Niger", "🇲🇱 말리": "Mali", "🇸🇳 세네갈": "Senegal", "🇬🇲 감비아": "Gambia", "🇬🇳 기니": "Guinea",
-    "🇸🇱 시에라리온": "Sierra Leone", "🇱🇷 라이베리아": "Liberia", "🇨🇮 코트디부아르": "Ivory Coast", "🇧🇫 부르키나파소": "Burkina Faso", "🇧🇯 베냉": "Benin",
-    "🇪🇷 에리트레아": "Eritrea", "🇩🇯 지부티": "Djibouti", "🇸🇴 소말리아": "Somalia", "🇷🇼 르완다": "Rwanda", "🇧🇮 부룬디": "Burundi",
-    "🇲🇼 말라위": "Malawi", "🇱🇸 레소토": "Lesotho", "🇸🇿 에스와티니": "Eswatini", "🇲🇺 모리셔스": "Mauritius", "🇸🇨 세이셸": "Seychelles",
-    "🇰🇲 코모로": "Comoros", "🇨🇻 카보베르데": "Cape Verde", "🇸🇹 상투메 프린시페": "Sao Tome and Principe", "🇬🇾 가이아나": "Guyana", "🇸🇷 수리남": "Suriname",
-    "🇧🇸 바하마": "Bahamas", "𝔍🇲 자메이카": "Jamaica", "🇭🇹 아이티": "Haiti", "🇦🇬 안티가 바부다": "Antigua and Barbuda", "🇰🇳 세인트키츠 네비스": "St. Kitts and Nevis",
-    "🇩🇲 도미니카 연방": "Dominica", "🇱🇨 세인트루시아": "St. Lucia", "🇻🇨 세인트빈센트그레나딘": "St. Vincent", "🇧🇧 바베이도스": "Barbados", "🇬🇩 그레나다": "Grenada",
-    "🇹🇹 트리니다드 토바고": "Trinidad and Tobago", "🇧🇿 벨리즈": "Belize", "🇲🇭 마셜 제도": "Marshall Islands", "🇫🇲 미크로네시아": "Micronesia", "🇵🇼 팔라우": "Palau",
-    "🇬🇺 괌": "Guam", "🇰🇮 키리바시": "Kiribati", "🇹🇻 투발루": "Tuvalu", "🇳🇷 나우루": "Nauru", "🇸🇧 솔로몬 제도": "Solomon Islands",
-    "🇻🇺 바누아투": "Vanuatu", "🇹🇴 퉁가": "Tonga", "🇵🇬 파푸아뉴기니": "Papua New Guinea", "🇹🇱 동티모르": "East Timor", "🇧🇳 브루나이": "Brunei",
-    "🇹🇯 타지키스탄": "Tajikistan", "🇰🇬 키르기스스탄": "Kyrgyzstan", "🇹🇲 투르크메니스탄": "Turkmenistan", "🇦🇫 아프가니스탄": "Afghanistan"
-};
-
-const worldCountries = Object.keys(countryEnglishMap);
+// 국가 리스트 (총검조합은 확률 조정을 위해 아래 일반 국가 풀에서 제외하고 분리 처리함)
+const worldCountries = [
+    "🇺🇸 미국", "🇯🇵 일본", "🇨🇳 중국", "🇷🇺 러시아", "🇬🇧 영국", "🇩🇪 독일", "🇫🇷 프랑스", "🇨🇦 캐나다", "🇦🇺 호주", "🇧🇷 브라질", "🇮🇹 이탈리아", "🇪🇸 스페인", "🇮🇳 인도", "🇻🇳 베트남", "🇹🇭 태국", "🇹🇷 튀르키예", "🇲🇽 멕시코", "🇪🇬 이집트", "🇸🇦 사우디아라비아", "🇿🇦 남아프리카 공화국", "🇦🇷 아르헨티나", "🇳🇱 네덜란드", "🇸🇪 스웨덴", "🇨🇭 스위스", "🇳🇿 뉴질랜드", "🇵🇭 필리핀", "🇲🇾 말레이시아", "🇸🇬 싱가포르", "🇮🇩 인도네시아", "🇺🇦 우크라이나", "🇵🇱 폴란드", "🇳🇴 노르웨이", "🇩🇰 덴마크", "🇫ᛁ 핀란드", "🇮🇪 아일랜드", "🇧🇪 벨기에", "🇦🇹 오스트리아", "🇬🇷 그리스", "🇵🇹 포르투갈", "🇨🇿 체코", "🇭🇺 헝가리", "🇷🇴 루마니아", "🇧🇬 불가리아", "🇭🇷 크로아티아", "🇷🇸 세르비아", "🇸🇰 슬로바키아", "🇸🇮 슬로베니아", "🇺🇿 우즈베키스탄", "🇰🇿 카자흐스탄", "🇲🇳 몽골", "🇵🇰 파키스탄", "🇧🇩 방글라데시", "🇱🇰 스리랑카", "🇮🇷 이란", "🇮🇶 이라크", "🇮🇱 이스라엘", "🇦🇪 아랍에미리트", "🇶🇦 카타라", "🇰🇼 쿠웨이트", "🇴🇲 오만", "🇯🇴 요르단", "🇱🇧 레바논", "🇨🇱 칠레", "🇨🇴 콜롬비아", "🇵🇪 페루", "🇻🇪 베네수엘라", "🇪🇨 에콰도르", "🇧🇴 볼리비아", "🇵🇾 파라과이", "🇺🇾 우루과이", "🇨🇺 쿠바", "🇨🇷 코스타리카", "🇵🇦 파나마", "🇩🇴 도미니카 공화국", "🇬🇹 과테말라", "🇭🇳 온두라스", "🇸🇻 엘살바도르", "🇳🇮 니카라과", "🇲🇦 모로코", "🇩🇿 알제리", "🇹🇳 튀니지", "🇱🇾 리비아", "🇳🇬 나이지리아", "🇬🇭 가나", "🇰🇪 케냐", "🇪🇹 에티오피아", "🇹🇿 탄자니아", "🇺🇬 우간다", "🇲🇩 몰도바", "🇬🇪 조지아", "🇦🇲 아르메니아", "🇦🇿 아제르바이잔", "🇮🇸 아이슬란드", "🇱🇺 룩셈부르크", "🇲🇨 모나코", "🇻🇦 바티칸 시국", "🇲🇹 몰타", "🇨🇾 키프로스", "🇲🇲 미얀마", "🇰🇭 캄보디아", "🇱🇦 라오스", "🇳🇵 네팔", "🇧🇹 부탄", "🇲🇻 몰디브", "🇼🇸 사모아", "🇫🇯 피지", "🇹🇬 토고", "🇧🇭 바레인", "🇾🇪 예멘", "🇦🇩 안도라", "🇸🇲 산마리노", "🇱🇮 리히텐슈타인", "🇲🇬 마다가스카르", "🇦🇴 앙골라", "🇿🇲 잠비아", "🇿🇼 짐바브웨", "🇧🇼 보츠와나", "🇳🇦 나미비아", "🇲🇿 모زام비크", "🇨🇲 카메룬", "🇨🇬 콩고", "🇨🇩 콩고민주공화국", "🇬🇦 가봉", "🇨🇫 중앙아프리카 공화국", "🇹🇩 차드", "🇳🇪 니제르", "🇲🇱 말리", "🇸🇳 세네갈", "🇬🇲 감비아", "🇬🇳 기니", "🇸🇱 시에라리온", "🇱🇷 라이베리아", "🇨🇮 코트디부아르", "🇧🇫 부르키나파소", "🇧🇯 베냉", "🇪🇷 에리트레아", "🇩🇯 지부티", "🇸🇴 소말리아", "🇷🇼 르완다", "🇧🇮 부룬디", "🇲🇼 말라위", "🇱🇸 레소토", "🇸🇿 에스와티니", "🇲🇺 모리셔스", "🇸🇨 세이셸", "🇰🇲 코모로", "🇨🇻 카보베르데", "🇸🇹 상투메 프린시페", "🇬🇾 가이아나", "🇸🇷 수리남", "🇧🇸 바하마", "𝔍🇲 자메이카", "🇭🇹 아이티", "🇦🇬 안티가 바부다", "🇰🇳 세인트키츠 네비스", "🇩🇲 도미니카 연방", "🇱🇨 세인트루시아", "🇻🇨 세인트빈센트그레나딘", "🇧🇧 바베이도스", "🇬🇩 그레나다", "🇹🇹 트리니다드 토바고", "🇧🇿 벨리즈", "🇲🇭 마셜 제도", "🇫🇲 미크로네시아", "🇵🇼 팔라우", "🇬🇺 괌", "🇰🇮 키리바시", "🇹🇻 투발루", "🇳🇷 나우루", "🇸🇧 솔로몬 제도", "🇻🇺 바누아투", "🇹🇴 퉁가", "🇵🇬 파푸아뉴기니", "🇹🇱 동티모르", "🇧🇳 브루나이", "🇹🇯 타지키스탄", "🇰🇬 키르기스스탄", "🇹🇲 투르크메니스탄", "🇦🇫 아프가니스탄"
+];
 
 function generateSummary(countryName) {
     if (countryName === "🗡️ 총검조합") {
@@ -356,6 +308,33 @@ function generateSummary(countryName) {
     ];
     const index = Math.abs(countryName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % descriptions.length;
     return `${countryName} 테마에 맞춰 매칭된 조합입니다. ${descriptions[index]}`;
+}
+
+function showBayonetLayout(resultBox) {
+    resultBox.innerHTML = `
+        <div class="country-name" style="color: #cbd5e1;">🗡️ 총검조합</div>
+        <div class="weapon-grid">
+            <div class="weapon-card" style="border-top-color: #94a3b8;">
+                <div class="weapon-type">🔴 주무기</div>
+                <div class="weapon-name">건블레이드</div>
+            </div>
+            <div class="weapon-card" style="border-top-color: #64748b;">
+                <div class="weapon-type">🟠 보조무기</div>
+                <div class="weapon-name">권총</div>
+            </div>
+            <div class="weapon-card" style="border-top-color: #475569;">
+                <div class="weapon-type">🟡 근접무기</div>
+                <div class="weapon-name">전투도끼</div>
+            </div>
+            <div class="weapon-card" style="border-top-color: #334155;">
+                <div class="weapon-type">🟢 유틸리티</div>
+                <div class="weapon-name">배낭</div>
+            </div>
+        </div>
+        <div class="summary-box">
+            💡 <strong>조합 분석:</strong> ${generateSummary("🗡️ 총검조합")}
+        </div>
+    `;
 }
 
 function startRoulette() {
@@ -373,13 +352,16 @@ function startRoulette() {
 
     function roll() {
         const rand = Math.random();
-        if (rand < 0.1) {
+        // 화면 돌아가는 연출 애니메이션용 분기
+        if (rand < 0.053) {
+            resultBox.innerHTML = `<div class="country-name" style="color: #cbd5e1;">🗡️ 총검조합</div>`;
+        } else if (rand < 0.15) {
             resultBox.innerHTML = `<div class="country-name">🎁 BONUS (보너스)</div>`;
-        } else if (rand < 0.2) {
+        } else if (rand < 0.25) {
             resultBox.innerHTML = `<div class="country-name fire-title">🔥 불조합 (HOT!)</div>`;
-        } else if (rand < 0.3) {
+        } else if (rand < 0.35) {
             resultBox.innerHTML = `<div class="country-name ice-title">❄️ 얼음조합 (COLD!)</div>`;
-        } else if (rand < 0.4) {
+        } else if (rand < 0.45) {
             resultBox.innerHTML = `<div class="country-name korea-title">🇰🇷 대한민국</div>`;
         } else {
             const randomIndex = Math.floor(Math.random() * worldCountries.length);
@@ -396,7 +378,7 @@ function startRoulette() {
         }
 
         if (elapsed >= duration) {
-            // 🚨 초희귀 대박 잭팟 확률 체크 (0.0000000000000000000001% = 1e-24)
+            // 🚨 초희귀 대박 잭팟 확률 체크
             const jackpotRand = Math.random();
             if (jackpotRand < 1e-24) {
                 playWinSound();
@@ -412,16 +394,20 @@ function startRoulette() {
                         💡 <strong>시스템 알림:</strong> 우주가 무너질 확률을 뚫고 당첨되셨습니다! 스크린샷을 즉시 저장하세요.
                     </div>
                 `;
-                speakEnglish("Skin Case Jackpot");
                 btn.innerText = "룰렛돌리기";
                 btn.disabled = false;
                 return; 
             }
 
-            // 일반 상시 확률 체크
+            // 최종 결과 연산 확률 배포
             const finalRand = Math.random(); 
             
-            if (finalRand < 0.10) { 
+            if (finalRand < 0.053) { 
+                // 🎯 총검조합 확정 확률: 정확히 5.3%
+                playNormalEndSound();
+                showBayonetLayout(resultBox);
+            } else if (finalRand < 0.153) { 
+                // 보너스 확률 (10%)
                 playWinSound(); 
                 resultBox.innerHTML = `
                     <div class="country-name">🎁 BONUS (보너스)</div>
@@ -432,8 +418,8 @@ function startRoulette() {
                         💡 <strong>조합 분석:</strong> 축하합니다! 대박 행운의 프리패스 보너스 타임입니다.
                     </div>
                 `;
-                speakEnglish("Bonus Time");
-            } else if (finalRand < 0.20) { 
+            } else if (finalRand < 0.253) { 
+                // 불조합 확률 (10%)
                 playWinSound(); 
                 resultBox.innerHTML = `
                     <div class="country-name fire-title">🔥 불조합 (HOT!)</div>
@@ -459,8 +445,8 @@ function startRoulette() {
                         💡 <strong>조합 분석:</strong> 전장을 불바다로 만들어 흔적도 없이 소탕해 버리는 화끈한 파괴 전용 불지옥 세팅입니다!
                     </div>
                 `;
-                speakEnglish("Fire Loadout");
-            } else if (finalRand < 0.30) {
+            } else if (finalRand < 0.353) {
+                // 얼음조합 확률 (10%)
                 playWinSound(); 
                 resultBox.innerHTML = `
                     <div class="country-name ice-title">❄️ 얼음조합 (COLD!)</div>
@@ -486,8 +472,8 @@ function startRoulette() {
                         💡 <strong>조합 분석:</strong> 상대를 순식간에 동결시켜 꼼짝 못 하게 무력화하는 극지방 기조의 절대 냉각 세팅입니다!
                     </div>
                 `;
-                speakEnglish("Ice Loadout");
-            } else if (finalRand < 0.40) {
+            } else if (finalRand < 0.453) {
+                // 대한민국 확률 (10%)
                 playWinSound();
                 const mainWp = weaponsData.main[Math.floor(Math.random() * weaponsData.main.length)];
                 const subWp = weaponsData.sub[Math.floor(Math.random() * weaponsData.sub.length)];
@@ -515,73 +501,43 @@ function startRoulette() {
                         </div>
                     </div>
                     <div class="summary-box summary-korea">
-                        💡 <strong>조합 분석:</strong> 축하합니다! 10%의 높은 확률을 뚫고 자랑스러운 대한민국 연합 전술 세트가 매칭되었습니다!
+                        💡 <strong>조합 분석:</strong> 축하합니다! 높은 확률을 뚫고 자랑스러운 대한민국 연합 전술 세트가 매칭되었습니다!
                     </div>
                 `;
-                speakEnglish("Republic of Korea");
             } else {
+                // 나머지 확률로 일반 국가 무작위 선정
                 playNormalEndSound(); 
                 const finalCountry = worldCountries[Math.floor(Math.random() * worldCountries.length)];
                 
-                // [신규] 만약 '총검조합' 이 걸렸을 때의 고정 무기 세팅
-                if (finalCountry === "🗡️ 총검조합") {
-                    resultBox.innerHTML = `
-                        <div class="country-name" style="color: #cbd5e1;">🗡️ 총검조합</div>
-                        <div class="weapon-grid">
-                            <div class="weapon-card" style="border-top-color: #94a3b8;">
-                                <div class="weapon-type">🔴 주무기</div>
-                                <div class="weapon-name">건블레이드</div>
-                            </div>
-                            <div class="weapon-card" style="border-top-color: #64748b;">
-                                <div class="weapon-type">🟠 보조무기</div>
-                                <div class="weapon-name">권총</div>
-                            </div>
-                            <div class="weapon-card" style="border-top-color: #475569;">
-                                <div class="weapon-type">🟡 근접무기</div>
-                                <div class="weapon-name">전투도끼</div>
-                            </div>
-                            <div class="weapon-card" style="border-top-color: #334155;">
-                                <div class="weapon-type">🟢 유틸리티</div>
-                                <div class="weapon-name">배낭</div>
-                            </div>
+                const mainWp = weaponsData.main[Math.floor(Math.random() * weaponsData.main.length)];
+                const subWp = weaponsData.sub[Math.floor(Math.random() * weaponsData.sub.length)];
+                const meleeWp = weaponsData.melee[Math.floor(Math.random() * weaponsData.melee.length)];
+                const utilityWp = weaponsData.utility[Math.floor(Math.random() * weaponsData.utility.length)];
+                
+                resultBox.innerHTML = `
+                    <div class="country-name">${finalCountry}</div>
+                    <div class="weapon-grid">
+                        <div class="weapon-card" style="border-top-color: #ff416c;">
+                            <div class="weapon-type">🔴 주무기</div>
+                            <div class="weapon-name">${mainWp}</div>
                         </div>
-                        <div class="summary-box">
-                            💡 <strong>조합 분석:</strong> ${generateSummary(finalCountry)}
+                        <div class="weapon-card" style="border-top-color: #ff4b2b;">
+                            <div class="weapon-type">🟠 보조무기</div>
+                            <div class="weapon-name">${subWp}</div>
                         </div>
-                    `;
-                } else {
-                    // 일반 국가들의 랜덤 무기 조합
-                    const mainWp = weaponsData.main[Math.floor(Math.random() * weaponsData.main.length)];
-                    const subWp = weaponsData.sub[Math.floor(Math.random() * weaponsData.sub.length)];
-                    const meleeWp = weaponsData.melee[Math.floor(Math.random() * weaponsData.melee.length)];
-                    const utilityWp = weaponsData.utility[Math.floor(Math.random() * weaponsData.utility.length)];
-                    
-                    resultBox.innerHTML = `
-                        <div class="country-name">${finalCountry}</div>
-                        <div class="weapon-grid">
-                            <div class="weapon-card" style="border-top-color: #ff416c;">
-                                <div class="weapon-type">🔴 주무기</div>
-                                <div class="weapon-name">${mainWp}</div>
-                            </div>
-                            <div class="weapon-card" style="border-top-color: #ff4b2b;">
-                                <div class="weapon-type">🟠 보조무기</div>
-                                <div class="weapon-name">${subWp}</div>
-                            </div>
-                            <div class="weapon-card" style="border-top-color: #00c6ff;">
-                                <div class="weapon-type">🟡 근접무기</div>
-                                <div class="weapon-name">${meleeWp}</div>
-                            </div>
-                            <div class="weapon-card" style="border-top-color: #2ed573;">
-                                <div class="weapon-type">🟢 유틸리티</div>
-                                <div class="weapon-name">${utilityWp}</div>
-                            </div>
+                        <div class="weapon-card" style="border-top-color: #00c6ff;">
+                            <div class="weapon-type">🟡 근접무기</div>
+                            <div class="weapon-name">${meleeWp}</div>
                         </div>
-                        <div class="summary-box">
-                            💡 <strong>조합 분석:</strong> ${generateSummary(finalCountry)}
+                        <div class="weapon-card" style="border-top-color: #2ed573;">
+                            <div class="weapon-type">🟢 유틸리티</div>
+                            <div class="weapon-name">${utilityWp}</div>
                         </div>
-                    `;
-                }
-                speakEnglish(countryEnglishMap[finalCountry]); 
+                    </div>
+                    <div class="summary-box">
+                        💡 <strong>조합 분석:</strong> ${generateSummary(finalCountry)}
+                    </div>
+                `;
             }
             
             btn.innerText = "룰렛돌리기";
